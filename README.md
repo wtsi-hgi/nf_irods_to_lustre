@@ -5,4 +5,5 @@ It pulls cellranger data of @sbw experiments from google-spreadsheet list of *sa
 See `inputs.nf` in usptream repo.    
 See uptream repo branch `template` for instructions on how to run pipeline.
 
+add sql:
 https://github.com/nextflow-io/nf-sqldb#readme
