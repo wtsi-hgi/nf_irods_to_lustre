@@ -12,3 +12,4 @@ nextflow_ci_branch.txt
 report.html
 body.json
 google_api_credentials.json
+sql_credentials.conf
