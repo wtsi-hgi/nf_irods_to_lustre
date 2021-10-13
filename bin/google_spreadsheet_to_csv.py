@@ -16,7 +16,7 @@ from logdecorator import log_on_start, log_on_end, log_on_error, log_exception
     + "gsheet: {gsheet:s}\n"
     + "input_sheet_name: {input_sheet_name:s}\n"
     + "output_csv_name: {output_csv_name:s}"))
-def gsheet_to_csv(creds_json, gsheet, output_csv_name):
+def gsheet_to_csv(creds_json, gsheet, input_sheet_name, output_csv_name):
     """Use google API and Service Account to convert google Spreadsheet to local csv file."""
     creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json)
     client = gspread.authorize(creds)
