@@ -4,3 +4,5 @@ This pipeline is ran by upstream Gitlab `nextflow_ci` HGI repo https://gitlab.in
 It pulls cellranger data of @sbw experiments from google-spreadsheet list of *sanger_sample_ids*.     
 See `inputs.nf` in usptream repo.    
 See uptream repo branch `template` for instructions on how to run pipeline.
+
+https://github.com/nextflow-io/nf-sqldb#readme
