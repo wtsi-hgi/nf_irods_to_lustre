@@ -9,6 +9,7 @@ process gsheet_to_csv {
     val(gsheet)
     path(creds_json)
     val(output_csv_name)
+    val(input_sheet_name)
 
     output: 
     path("${output_csv_name}"), emit: samples_csv
@@ -18,13 +19,16 @@ process gsheet_to_csv {
 
     script:
     """
-    python3 $workflow.projectDir/../bin/google_spreadsheet_to_csv.py \\
-       --creds_json ${creds_json} --gsheet ${gsheet} --output_csv_name ${output_csv_name}
+python3 $workflow.projectDir/../bin/google_spreadsheet_to_csv.py \\
+--input_sheet_name ${input_sheet_name} \\
+--creds_json ${creds_json} \\
+--gsheet ${gsheet} \\
+--output_csv_name ${output_csv_name}
 
-    # Save work dir so that it can be removed onComplete of workflow, 
-    # to ensure that this task Irods search is re-run on each run NF run, 
-    # in case new sequencing samples are ready: 
-    WORK_DIR=\$PWD
-    study_id=gsheet
+# Save work dir so that it can be removed onComplete of workflow, 
+# to ensure that this task Irods search is re-run on each run NF run, 
+# in case new sequencing samples are ready: 
+WORK_DIR=\$PWD
+study_id=gsheet
     """
 }
