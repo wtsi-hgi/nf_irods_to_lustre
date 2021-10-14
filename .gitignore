@@ -13,3 +13,4 @@ report.html
 body.json
 google_api_credentials.json
 sql_credentials.conf
+h2_db.csv
