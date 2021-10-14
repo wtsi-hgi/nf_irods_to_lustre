@@ -8,17 +8,19 @@ from logdecorator import log_on_start, log_on_end, log_on_error, log_exception
 @click.command()
 @click.option('--creds_json', required=True, type=click.Path(exists=True), help='Google API credentials')
 @click.option('--gsheet', required=True, help='name of input Google spreadsheet')
+@click.option('--input_sheet_name', required=True, default='Sheet1', show_default=True, help='google spreadsheet sheet name')
 @click.option('--output_csv_name', required=True, help='path or name of output csv file')
 
 @log_on_start(logging.INFO, (
     "\ncreds_json: {creds_json:s}\n"
     + "gsheet: {gsheet:s}\n"
+    + "input_sheet_name: {input_sheet_name:s}\n"
     + "output_csv_name: {output_csv_name:s}"))
-def gsheet_to_csv(creds_json, gsheet, output_csv_name):
+def gsheet_to_csv(creds_json, gsheet, input_sheet_name, output_csv_name):
     """Use google API and Service Account to convert google Spreadsheet to local csv file."""
     creds = ServiceAccountCredentials.from_json_keyfile_name(creds_json)
     client = gspread.authorize(creds)
-    sheet = client.open(gsheet).worksheet("Connect_Valid")
+    sheet = client.open(gsheet).worksheet(input_sheet_name)
     data = sheet.get_all_values()
     headers = data.pop(0)
     df = pd.DataFrame(data, columns=headers)
