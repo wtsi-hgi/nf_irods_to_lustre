@@ -51,6 +51,7 @@ def main():
     Search_IDs = '\''+'\',\''.join(set(Data.experiment_id))+'\''
     Data['n_pooled']='1' #add these if availabe in mlwh
     Data['donor_vcf_ids']='none1' #add these if availabe in mlwh
+    Data['data_path_10x_format']=Data['data_path_10x_format']+'/..'
     # do the mysql fetch for extra metadata.
     # if available add the number of samples pooled and produce the correct input format.
     if (USERNAME!=''):
