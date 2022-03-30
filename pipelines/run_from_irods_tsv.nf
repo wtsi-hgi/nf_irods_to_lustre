@@ -106,10 +106,10 @@ workflow run_from_irods_tsv {
     ch_work_dir_to_remove = imeta_study_cellranger.out.work_dir_to_remove
     
     emit:
-    ch_work_dir_to_remove
-    ch_cellranger_metadata_tsv
-    ch_file_paths_10x_tsv
-    ch_file_paths_10x_tsv_raw
+		ch_work_dir_to_remove
+		ch_cellranger_metadata_tsv
+		ch_file_paths_10x_tsv
+		ch_file_paths_10x_tsv_raw
 }
 
 // TODO:  here or main.nf:   // store work dirs to remove into tsv file for onComplete removal.
