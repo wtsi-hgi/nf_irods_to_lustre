@@ -30,13 +30,30 @@ try:
     HOST = mod.HOST
     DATABASE = mod.DATABASE
 except:
-    print('failed')
     PASSWORD = ''
     USERNAME = ''   
     PORT = ''
     HOST = ''
     DATABASE = ''
-print(PASSWORD)
+
+
+
+def get_samples_reception_metadata():
+    # Here we connect to Titian database from samples reception and extract the required fields - such as volume or any other issues with samples.
+    import imp
+    import cx_Oracle
+
+    mod = imp.load_source("module_name", '/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/secret/titan.py')
+    T_PASSWORD = mod.PASSWORD
+    T_USER = mod.USERNAME
+    T_DSN = mod.PORT
+    
+    connection = cx_Oracle.connect(user=T_USER, password=T_PASSWORD,dsn=T_DSN)
+    cursor = connection.cursor()
+    cursor.execute("""SELECT * FROM MOSAIC.container_report""")
+    Reviewed_metadata_donors = pd.DataFrame(cursor.fetchall())
+    return Reviewed_metadata_donors
+
 def main():
     """Run CLI."""
     parser = argparse.ArgumentParser(
@@ -127,8 +144,18 @@ def main():
             dons = ','.join(list(Reviewed_metadata_donors.loc[idx1]['donor'].values))
             Data.loc[idx1,'donor_vcf_ids']='\''+dons+'\''
         Data=Data.reset_index()
+        Reviewed_metadata.reset_index(inplace=True)
         Reviewed_metadata.to_csv('Extra_Metadata.tsv',sep='\t', index=False)
+        try:
+            Reviewed_metadata_donors.reset_index(inplace=True)
+            Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('donor')
+            Reviewed_metadata_donors.to_csv('Extra_Metadata_Donors.tsv',sep='\t')
 
+            
+
+
+        except:
+            print("donor_metadata not available")
         # Here we also want to querry the google sheet to retrieve additional metrics - Date sample recieved, Low viability, Low volume on arrival.
         
     # Data2 = Data.loc['experiment_id','n_pooled','donor_vcf_ids','data_path_10x_format']
