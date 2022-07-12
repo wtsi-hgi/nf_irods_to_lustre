@@ -16,7 +16,7 @@
 
 __date__ = '2022-04-01'
 __version__ = '0.0.1'
-
+import numpy as np
 import argparse
 import pandas as pd
 import mysql.connector
@@ -245,6 +245,7 @@ def main():
         Data = Data.set_index('experiment_id')
         Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
         Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
+        # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
         try:
             Data['n_pooled']=Reviewed_metadata['n_pooled']
             for idx1 in Data.index:
@@ -271,6 +272,7 @@ def main():
             Reviewed_metadata_donors=Reviewed_metadata_donors.reset_index()
             Reviewed_metadata_donors['experiment_id']=Reviewed_metadata_donors['experiment_id']+'__'+Reviewed_metadata_donors['donor']
             Reviewed_metadata_donors=Reviewed_metadata_donors.set_index('experiment_id')
+            Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value='N/A')
             Reviewed_metadata_donors.to_csv('Extra_Metadata_Donors.tsv',sep='\t')
 
         except:
