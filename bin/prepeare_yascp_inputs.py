@@ -127,8 +127,8 @@ def main():
             auth_plugin='mysql_native_password'
         )
         mycursor = mydb.cursor()
-        sql = f"SELECT sample1.name as experiment_id,sample1.id_library_lims as chromium_channel,sample1.id_run,sample1.cohort,sample1.id_study_tmp, sample1.id_study_lims, sample1.last_updated, sample1.public_name, sample1.donor_id, sample1.instrument_model, 	sample1.instrument_external_name, sample1.instrument_name, \
-                COUNT(sample1.name) as n_pooled FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,original_study.name as cohort,iseq_flowcell.id_study_tmp, study.id_study_lims, study.last_updated, sample.public_name, sample.donor_id, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
+        sql = f"SELECT sample1.name as experiment_id,sample1.id_library_lims as chromium_channel,sample1.id_run,sample1.id_study_tmp, sample1.id_study_lims, sample1.last_updated,  sample1.instrument_model, 	sample1.instrument_external_name, sample1.instrument_name, \
+                COUNT(sample1.name) as n_pooled FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, study.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
                 donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
                     JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                     JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
@@ -161,8 +161,40 @@ def main():
                 Reviewed_metadata.columns = field_names
 
         Reviewed_metadata['instrument'] = Reviewed_metadata['instrument_model']+'_'+Reviewed_metadata['instrument_name']+'_'+Reviewed_metadata['instrument_external_name']
+        # sql_donors = f"SELECT DISTINCT sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
+        #                 donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
+        #                 JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
+        #                 JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
+        #                 JOIN mlwarehouse.iseq_product_metrics ON iseq_flowcell.id_iseq_flowcell_tmp = iseq_product_metrics.id_iseq_flowcell_tmp \
+        #                 JOIN mlwarehouse.iseq_run on iseq_run.id_run = iseq_product_metrics.id_run \
+        #                 JOIN mlwarehouse.iseq_run_lane_metrics on iseq_run_lane_metrics.id_run = iseq_run.id_run \
+        #                 JOIN mlwarehouse.psd_sample_compounds_components pscc ON iseq_flowcell.id_sample_tmp = pscc.compound_id_sample_tmp \
+        #                 JOIN mlwarehouse.sample as donors ON donors.id_sample_tmp = pscc.component_id_sample_tmp \
+        #                 JOIN mlwarehouse.stock_resource ON donors.id_sample_tmp = stock_resource.id_sample_tmp \
+        #                 JOIN mlwarehouse.study as original_study ON original_study.id_study_tmp = stock_resource.id_study_tmp \
+        #                 WHERE sample.name IN ({Search_IDs})" 
+                        # 'Barcode' IN ('S2-046-00331','S2-046-00691')
+        # sql_donors = f"SELECT DISTINCT sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
+        #                 donors.supplier_name as donor, B.live_cell_count,C.viability,D.molarity, D2.volume, D3.RIN,D4.Concentration FROM mlwarehouse.iseq_flowcell \
+        #                 JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
+        #                 JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
+        #                 JOIN mlwarehouse.iseq_product_metrics ON iseq_flowcell.id_iseq_flowcell_tmp = iseq_product_metrics.id_iseq_flowcell_tmp \
+        #                 JOIN mlwarehouse.iseq_run on iseq_run.id_run = iseq_product_metrics.id_run \
+        #                 JOIN mlwarehouse.iseq_run_lane_metrics on iseq_run_lane_metrics.id_run = iseq_run.id_run \
+        #                 JOIN mlwarehouse.psd_sample_compounds_components pscc ON iseq_flowcell.id_sample_tmp = pscc.compound_id_sample_tmp \
+        #                 JOIN mlwarehouse.sample as donors ON donors.id_sample_tmp = pscc.component_id_sample_tmp \
+        #                 JOIN mlwarehouse.stock_resource ON donors.id_sample_tmp = stock_resource.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'live_cell_count' from mlwarehouse.qc_result  WHERE qc_type = 'live_cell_count') as B on donors.id_sample_tmp = B.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,'',units) as 'viability' from mlwarehouse.qc_result  WHERE qc_type = 'viability') as C on donors.id_sample_tmp = C.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'molarity' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D on donors.id_sample_tmp = D.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'volume' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D2 on donors.id_sample_tmp = D.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'RIN' from mlwarehouse.qc_result  WHERE qc_type = 'RIN') as D3 on donors.id_sample_tmp = D.id_sample_tmp \
+        #                 LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on donors.id_sample_tmp = D.id_sample_tmp \
+        #                 WHERE sample.name IN ({Search_IDs})" 
+
+        mycursor2 = mydb.cursor()
         sql_donors = f"SELECT DISTINCT sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
-                        donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
+                        donors.supplier_name as donor, B.live_cell_count,C.viability,D.molarity, D2.volume, D3.RIN,D4.Concentration FROM mlwarehouse.iseq_flowcell \
                         JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                         JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
                         JOIN mlwarehouse.iseq_product_metrics ON iseq_flowcell.id_iseq_flowcell_tmp = iseq_product_metrics.id_iseq_flowcell_tmp \
@@ -171,19 +203,44 @@ def main():
                         JOIN mlwarehouse.psd_sample_compounds_components pscc ON iseq_flowcell.id_sample_tmp = pscc.compound_id_sample_tmp \
                         JOIN mlwarehouse.sample as donors ON donors.id_sample_tmp = pscc.component_id_sample_tmp \
                         JOIN mlwarehouse.stock_resource ON donors.id_sample_tmp = stock_resource.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'live_cell_count' from mlwarehouse.qc_result  WHERE qc_type = 'live_cell_count') as B on donors.id_sample_tmp = B.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,'',units) as 'viability' from mlwarehouse.qc_result  WHERE qc_type = 'viability') as C on donors.id_sample_tmp = C.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'molarity' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D on donors.id_sample_tmp = D.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'volume' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D2 on donors.id_sample_tmp = D2.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'RIN' from mlwarehouse.qc_result  WHERE qc_type = 'RIN') as D3 on donors.id_sample_tmp = D3.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on donors.id_sample_tmp = D4.id_sample_tmp \
                         JOIN mlwarehouse.study as original_study ON original_study.id_study_tmp = stock_resource.id_study_tmp \
-                        WHERE sample.name IN ({Search_IDs})" 
-                        # 'Barcode' IN ('S2-046-00331','S2-046-00691')
+                    WHERE sample.name IN ({Search_IDs})"
+
 
         # Here we can also establish the cohorts and generate extra metadata per sample. 
         # Have to also retrieve metadata from titin sample reception.
 
-        mycursor.execute(sql_donors)
-        Reviewed_metadata_donors = pd.DataFrame(mycursor.fetchall())
+        mycursor2.execute(sql_donors)
+        Reviewed_metadata_donors = pd.DataFrame(mycursor2.fetchall())
         if not Reviewed_metadata_donors.empty:
-            field_names = [i[0] for i in mycursor.description]
+            field_names = [i[0] for i in mycursor2.description]
             Reviewed_metadata_donors.columns = field_names
 
+        # here we count the number ok UKBB and ELGH cohort individuals in pool
+        Reviewed_metadata['nr_ukbb_samples']=0
+        Reviewed_metadata['nr_elgh_samples']=0
+        Reviewed_metadata['nr_spikeins']=0
+        for id in set(Reviewed_metadata_donors.experiment_id):
+            # print(id)
+            pool_samples = Reviewed_metadata_donors[Reviewed_metadata_donors.experiment_id == id]
+            ELGH = pool_samples[pool_samples['cohort'].str.contains('ELGH')]
+            Spikeins_labeled_as_elgh = ELGH[ELGH['donor'].str.contains('THP1|U937')]
+            UKBB = pool_samples[pool_samples['cohort'].str.contains('UKB')]
+            Spikeins_labeled_as_ukb = UKBB[UKBB['donor'].str.contains('THP1|U937')]
+            spikeins = pool_samples[pool_samples['cohort'].str.contains('controls')]
+            nr_spikeins = len(spikeins)+len(Spikeins_labeled_as_elgh)+len(Spikeins_labeled_as_ukb)
+            nr_ukbb = len(UKBB)-len(Spikeins_labeled_as_ukb)
+            nr_elgh = len(ELGH)-len(Spikeins_labeled_as_elgh)
+            Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_elgh_samples']=nr_elgh
+            Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_spikeins']=nr_spikeins
+            Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_ukbb_samples']=nr_ukbb
+            
 
         Data = Data.set_index('experiment_id')
         Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
