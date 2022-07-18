@@ -28,7 +28,7 @@ params {
     csv_samples_id_mode {
         // will iget samples listed one-per-line in input file "samples.tsv":
         // it needs to be tab-separated and have a column name "sanger_sample_id" that matches Irods samples.
-        input_samples_csv = "$PWD/../../input.tsv"
+        input_samples_csv = "$PWD/input.tsv"
         input_samples_csv_column = "sanger_sample_id" // column for Irods sample IDs to search.
     }
     

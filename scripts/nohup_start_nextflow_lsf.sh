@@ -12,7 +12,7 @@ rm -f nextflow.nohup.PID.txt
 # start Nextflow in background:
 export NXF_OPTS="-Xms5G -Xmx5G"
 nohup nextflow run ./nf_irods_to_lustre/pipelines/main.nf \
-      -c ./nf_irods_to_lustre/nextflow.config -c inputs.nf -profile lsf \
+      -c ./nf_irods_to_lustre/nextflow.config -c ./nf_irods_to_lustre/scripts/inputs.nf -profile lsf \
       -with-dag flowchart.png -with-report report.html --resume --nf_ci_loc $PWD > nextflow.nohup.log 2>&1 & 
 
 # get process PID 
