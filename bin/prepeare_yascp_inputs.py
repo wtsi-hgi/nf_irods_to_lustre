@@ -248,7 +248,7 @@ def main():
         # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
         try:
             Data['n_pooled']=Reviewed_metadata['n_pooled']
-            for idx1 in Data.index:
+            for idx1 in set(Data.index):
                 print(idx1)
                 dons = ','.join(list(Reviewed_metadata_donors.loc[idx1]['donor'].values))
                 Data.loc[idx1,'donor_vcf_ids']='\''+dons+'\''
