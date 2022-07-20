@@ -203,12 +203,12 @@ def main():
                         JOIN mlwarehouse.psd_sample_compounds_components pscc ON iseq_flowcell.id_sample_tmp = pscc.compound_id_sample_tmp \
                         JOIN mlwarehouse.sample as donors ON donors.id_sample_tmp = pscc.component_id_sample_tmp \
                         JOIN mlwarehouse.stock_resource ON donors.id_sample_tmp = stock_resource.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'live_cell_count' from mlwarehouse.qc_result  WHERE qc_type = 'live_cell_count') as B on donors.id_sample_tmp = B.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,'',units) as 'viability' from mlwarehouse.qc_result  WHERE qc_type = 'viability') as C on donors.id_sample_tmp = C.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'molarity' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D on donors.id_sample_tmp = D.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'volume' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D2 on donors.id_sample_tmp = D2.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'RIN' from mlwarehouse.qc_result  WHERE qc_type = 'RIN') as D3 on donors.id_sample_tmp = D3.id_sample_tmp \
-                        LEFT JOIN (select id_sample_tmp,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on donors.id_sample_tmp = D4.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'live_cell_count' from mlwarehouse.qc_result  WHERE qc_type = 'live_cell_count') as B on A.id_sample_tmp = B.id_sample_tmp \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,'',units) as 'viability' from mlwarehouse.qc_result  WHERE qc_type = 'viability') as C on B.id_sample_tmp = C.id_sample_tmp AND B.id_pool_lims = C.id_pool_lims \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'molarity' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D on B.id_sample_tmp = D.id_sample_tmp AND B.id_pool_lims = D.id_pool_lims \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'RIN' from mlwarehouse.qc_result  WHERE qc_type = 'RIN') as D3 on B.id_sample_tmp = D3.id_sample_tmp AND B.id_pool_lims = D3.id_pool_lims \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'volume' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D2 on B.id_sample_tmp = D2.id_sample_tmp AND B.id_sample_tmp = C.id_sample_tmp AND B.id_pool_lims = D2.id_pool_lims \
+                        LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on B.id_sample_tmp = D4.id_sample_tmp AND B.id_pool_lims = D4.id_pool_lims \
                         JOIN mlwarehouse.study as original_study ON original_study.id_study_tmp = stock_resource.id_study_tmp \
                     WHERE sample.name IN ({Search_IDs})"
 
