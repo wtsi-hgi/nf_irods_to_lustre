@@ -226,9 +226,11 @@ def main():
         Reviewed_metadata['nr_ukbb_samples']=0
         Reviewed_metadata['nr_elgh_samples']=0
         Reviewed_metadata['nr_spikeins']=0
-        for id in set(Reviewed_metadata_donors.experiment_id):
+        Reviewed_metadata_donors_dubDrop = Reviewed_metadata_donors[['experiment_id','cohort','donor']].drop_duplicates()
+
+        for id in set(Reviewed_metadata_donors_dubDrop.experiment_id):
             # print(id)
-            pool_samples = Reviewed_metadata_donors[Reviewed_metadata_donors.experiment_id == id]
+            pool_samples = Reviewed_metadata_donors_dubDrop[Reviewed_metadata_donors_dubDrop.experiment_id == id]
             ELGH = pool_samples[pool_samples['cohort'].str.contains('ELGH')]
             Spikeins_labeled_as_elgh = ELGH[ELGH['donor'].str.contains('THP1|U937')]
             UKBB = pool_samples[pool_samples['cohort'].str.contains('UKB')]
