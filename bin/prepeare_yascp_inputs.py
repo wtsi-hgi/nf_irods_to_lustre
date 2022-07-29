@@ -223,7 +223,7 @@ def main():
                                 JOIN mlwarehouse.sample as donors ON donors.id_sample_tmp = pscc.component_id_sample_tmp \
                                 JOIN mlwarehouse.stock_resource ON donors.id_sample_tmp = stock_resource.id_sample_tmp \
                                 JOIN mlwarehouse.study as original_study ON original_study.id_study_tmp = stock_resource.id_study_tmp \
-                                WHERE sample.name IN ('CRD_CMB12968557') AND donors.supplier_name = '0030007475075') as A \
+                                WHERE sample.name IN ({Search_IDs})) as A \
                                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'live_cell_count' from mlwarehouse.qc_result  WHERE qc_type = 'live_cell_count') as B on A.id_sample_tmp = B.id_sample_tmp \
                                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,'',units) as 'viability' from mlwarehouse.qc_result  WHERE qc_type = 'viability') as C on A.id_sample_tmp = C.id_sample_tmp AND B.id_pool_lims = C.id_pool_lims \
                                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'molarity' from mlwarehouse.qc_result  WHERE qc_type = 'molarity') as D on A.id_sample_tmp = D.id_sample_tmp AND B.id_pool_lims = D.id_pool_lims \
