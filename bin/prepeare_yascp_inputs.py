@@ -128,7 +128,7 @@ def main():
         )
         mycursor = mydb.cursor()
         sql = f"SELECT sample1.name as experiment_id,sample1.id_library_lims as chromium_channel,sample1.id_run,sample1.id_study_tmp, sample1.id_study_lims, sample1.last_updated,  sample1.instrument_model, 	sample1.instrument_external_name, sample1.instrument_name, \
-                COUNT(sample1.name) as n_pooled FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, study.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
+                COUNT(sample1.name) as n_pooled FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, donors.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
                 donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
                     JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                     JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
