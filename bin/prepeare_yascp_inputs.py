@@ -294,7 +294,7 @@ def main():
             Reviewed_metadata_donors=Reviewed_metadata_donors.reset_index()
             Reviewed_metadata_donors['experiment_id']=Reviewed_metadata_donors['experiment_id']+'__'+Reviewed_metadata_donors['donor']
             Reviewed_metadata_donors=Reviewed_metadata_donors.set_index('experiment_id')
-            Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value='N/A')
+            Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value='NA')
             Reviewed_metadata_donors.to_csv('Extra_Metadata_Donors.tsv',sep='\t')
 
         except:
