@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # activate Nextflow conda env
-conda init bash
+/software/hgi/installs/anaconda3/bin/conda init bash
 eval "$(conda shell.bash hook)"
-conda activate nextflow
+/software/hgi/installs/anaconda3/bin/conda activate nextflow
 
 # clean up previous run files
 rm -f *.log
