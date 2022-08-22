@@ -6,15 +6,12 @@ eval "$(cat /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch
 conda init bash
 eval "$(conda shell.bash hook)"
 
-# activate Nextflow conda env
-conda init bash
-eval "$(conda shell.bash hook)"
 conda activate nextflow
 
 # clean up previous run files
 rm -f *.log
 rm -f nextflow.nohup.PID.txt 
-
+which bsub
 # start Nextflow in background:
 export NXF_OPTS="-Xms5G -Xmx5G"
 nextflow run $PWD/nf_irods_to_lustre/pipelines/main.nf \
