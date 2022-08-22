@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-SHELL=/bin/bash
-BASH_ENV=/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/SETUP_fech_input_prep/.bashrc_conda
+export SHELL=/bin/bash
+export BASH_ENV=/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/SETUP_fech_input_prep/.bashrc_conda
 # activate Nextflow conda env
 eval "$(cat /lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/SETUP_fech_input_prep/.bashrc_conda | tail -n +10)"
 conda init bash
