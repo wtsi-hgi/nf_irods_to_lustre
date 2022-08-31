@@ -51,10 +51,13 @@ def get_samples_reception_metadata(Reviewed_metadata_donors):
         Search_IDs = '\''+'\',\''.join(set(samples))+'\''
         connection = cx_Oracle.connect(user=T_USER, password=T_PASSWORD,dsn=T_DSN)
         cursor = connection.cursor()
-        cursor.execute(f'SELECT A."Barcode",A."Issue",A."Creation date" AS Recieved,A."Amount",A."Concentration", B."SITE", C."FAMILY" FROM mosaic.container_report A \
-            LEFT JOIN (SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Name" LIKE A."Barcode" \
-            LEFT JOIN (SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH London Cohort\') C ON C."Name" LIKE A."Barcode" \
+        cursor.execute(f'SELECT A."Barcode",A."Substance ID",A."Issue",A."Creation date" AS Recieved,A."Amount",A."Concentration", B."SITE", C.FAMILY, D.DRAW_DATE FROM mosaic.container_report A \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Substance ID" LIKE A."Barcode"  \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH Cohort\') C ON C."Substance ID" LIKE A."Barcode" \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" DRAW_DATE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'%Sample Draw%\') D ON D."Substance ID" LIKE A."Barcode"\
             WHERE A."Barcode" IN ({Search_IDs})')
+
+
         # SELECT r.* FROM mosaic.container_report r WHERE r."Barcode" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813')
         #Site # SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FROM mosaic.substance_report WHERE mosaic.substance_report."Name" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813') AND mosaic.substance_report."Property Name" LIKE 'Site'
         # SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FROM mosaic.substance_report WHERE mosaic.substance_report."Name" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813') AND mosaic.substance_report."Property Name" LIKE 'ELGH London Cohort'
