@@ -52,9 +52,9 @@ def get_samples_reception_metadata(Reviewed_metadata_donors):
         connection = cx_Oracle.connect(user=T_USER, password=T_PASSWORD,dsn=T_DSN)
         cursor = connection.cursor()
         cursor.execute(f'SELECT A."Barcode",A."Substance ID",A."Issue",A."Creation date" AS Recieved,A."Amount",A."Concentration", B."SITE", C.FAMILY, D.DRAW_DATE FROM mosaic.container_report A \
-            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Substance ID" LIKE A."Barcode"  \
-            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH Cohort\') C ON C."Substance ID" LIKE A."Barcode" \
-            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" DRAW_DATE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'%Sample Draw%\') D ON D."Substance ID" LIKE A."Barcode"\
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Substance ID" LIKE A."Barcode" OR B."Substance ID" LIKE A."Substance ID"  \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH Cohort\') C ON C."Substance ID" LIKE A."Barcode" OR C."Substance ID" LIKE A."Substance ID" \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" DRAW_DATE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'%Sample Draw%\') D ON D."Substance ID" LIKE A."Barcode" OR D."Substance ID" LIKE A."Substance ID"\
             WHERE A."Barcode" IN ({Search_IDs})')
 
 
