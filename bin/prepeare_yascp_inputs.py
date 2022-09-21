@@ -270,16 +270,16 @@ def main():
             field_names = [i[0] for i in mycursor2.description]
             Reviewed_metadata_donors.columns = field_names
 
+        if Reviewed_metadata_donors.empty:
+            All_Datasets = []
 
-        All_Datasets = []
-
-        D2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/ELGH_fech/results/yascp_inputs/input_file.tsv',sep='\t')
-        for i,row1 in D2.iterrows():
-            print(row1.experiment_id)
-            All_Samples = row1.donor_vcf_ids.replace('\'','').split(',')
-            for sam1 in All_Samples:
-                All_Datasets.append({'experiment_id':row1.experiment_id, 'cohort':'Cardinal ELGH','donor':sam1})
-        Reviewed_metadata_donors = pd.DataFrame(All_Datasets)
+            D2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/ELGH_fech/results/yascp_inputs/input_file.tsv',sep='\t')
+            for i,row1 in D2.iterrows():
+                print(row1.experiment_id)
+                All_Samples = row1.donor_vcf_ids.replace('\'','').split(',')
+                for sam1 in All_Samples:
+                    All_Datasets.append({'experiment_id':row1.experiment_id, 'cohort':'Cardinal ELGH','donor':sam1})
+            Reviewed_metadata_donors = pd.DataFrame(All_Datasets)
 
         # here we count the number ok UKBB and ELGH cohort individuals in pool
         Reviewed_metadata['nr_ukbb_samples']=0
