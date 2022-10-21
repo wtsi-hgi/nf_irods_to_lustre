@@ -51,10 +51,13 @@ def get_samples_reception_metadata(Reviewed_metadata_donors):
         Search_IDs = '\''+'\',\''.join(set(samples))+'\''
         connection = cx_Oracle.connect(user=T_USER, password=T_PASSWORD,dsn=T_DSN)
         cursor = connection.cursor()
-        cursor.execute(f'SELECT A."Barcode",A."Issue",A."Creation date" AS Recieved,A."Amount",A."Concentration", B."SITE", C."FAMILY" FROM mosaic.container_report A \
-            LEFT JOIN (SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Name" LIKE A."Barcode" \
-            LEFT JOIN (SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH London Cohort\') C ON C."Name" LIKE A."Barcode" \
+        cursor.execute(f'SELECT A."Barcode",A."Substance ID",A."Issue",A."Creation date" AS Recieved,A."Amount",A."Concentration", B."SITE", C.FAMILY, D.DRAW_DATE FROM mosaic.container_report A \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" SITE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'Site\') B ON B."Substance ID" LIKE A."Barcode" OR B."Substance ID" LIKE A."Substance ID"  \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" FAMILY FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'ELGH Cohort\') C ON C."Substance ID" LIKE A."Barcode" OR C."Substance ID" LIKE A."Substance ID" \
+            LEFT JOIN (SELECT mosaic.substance_report."Name",mosaic.substance_report."Substance ID", mosaic.substance_report."Property Value" DRAW_DATE FROM mosaic.substance_report WHERE mosaic.substance_report."Property Name" LIKE \'%Sample Draw%\') D ON D."Substance ID" LIKE A."Barcode" OR D."Substance ID" LIKE A."Substance ID"\
             WHERE A."Barcode" IN ({Search_IDs})')
+
+
         # SELECT r.* FROM mosaic.container_report r WHERE r."Barcode" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813')
         #Site # SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FROM mosaic.substance_report WHERE mosaic.substance_report."Name" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813') AND mosaic.substance_report."Property Name" LIKE 'Site'
         # SELECT mosaic.substance_report."Name", mosaic.substance_report."Property Value" FROM mosaic.substance_report WHERE mosaic.substance_report."Name" IN ('0030007476331','0030007480918','0030007476119','0030007476447','0030007475136','0030007476157','S2-999-90155','S2-999-90157','S2-999-90160','S2-046-00974','S2-999-90159','S2-046-00813') AND mosaic.substance_report."Property Name" LIKE 'ELGH London Cohort'
@@ -127,9 +130,18 @@ def main():
             auth_plugin='mysql_native_password'
         )
         mycursor = mydb.cursor()
-        sql = f"SELECT sample1.name as experiment_id,sample1.id_library_lims as chromium_channel,sample1.id_run,sample1.id_study_tmp, sample1.id_study_lims, sample1.last_updated,  sample1.instrument_model, 	sample1.instrument_external_name, sample1.instrument_name, \
-                COUNT(sample1.name) as n_pooled FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, donors.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
-                donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
+        sql = f"SELECT sample1.name as experiment_id,\
+                sample1.id_library_lims as chromium_channel,\
+                sample1.id_run,\
+                sample1.id_study_tmp,\
+                sample1.id_study_lims, \
+                sample1.last_updated,\
+                sample1.instrument_model, \
+                sample1.instrument_external_name, \
+                sample1.instrument_name, \
+                COUNT(sample1.name) as n_pooled \
+                    FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, donors.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
+                    donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
                     JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                     JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
                     JOIN mlwarehouse.iseq_product_metrics ON iseq_flowcell.id_iseq_flowcell_tmp = iseq_product_metrics.id_iseq_flowcell_tmp \
@@ -146,7 +158,19 @@ def main():
             field_names = [i[0] for i in mycursor.description]
             Reviewed_metadata.columns = field_names
         if len(Reviewed_metadata)==0:
-            sql = f"SELECT DISTINCT sample.sanger_sample_id as experiment_id,sample.cohort, iseq_flowcell.id_study_tmp, study.id_study_lims, study.last_updated, sample.public_name, sample.donor_id, iseq_run_lane_metrics.instrument_model, iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name \
+            sql = f"SELECT DISTINCT \
+                        sample.sanger_sample_id as experiment_id,\
+                        iseq_flowcell.id_library_lims  as chromium_channel, \
+                        sample.cohort, \
+                        iseq_product_metrics.id_run,\
+                        iseq_flowcell.id_study_tmp,\
+                        study.id_study_lims, \
+                        sample.last_updated, \
+                        sample.public_name, \
+                        sample.donor_id,\
+                        iseq_run_lane_metrics.instrument_model,\
+                        iseq_run_lane_metrics.instrument_external_name, \
+                        iseq_run_lane_metrics.instrument_name \
                 FROM mlwarehouse.iseq_flowcell \
                 JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                 JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
@@ -211,8 +235,10 @@ def main():
         #                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on B.id_sample_tmp = D4.id_sample_tmp AND B.id_pool_lims = D4.id_pool_lims \
         #                 JOIN mlwarehouse.study as original_study ON original_study.id_study_tmp = stock_resource.id_study_tmp \
         #             WHERE sample.name IN ({Search_IDs})"
-                        
-        sql_donors = f"SELECT A.*,B.id_pool_lims,B.live_cell_count,C.viability,D.molarity, D2.volume, D3.RIN,D4.Concentration FROM (SELECT DISTINCT donors.id_sample_tmp,sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
+
+         
+        sql_donors = f"SELECT A.*,B.id_pool_lims,B.live_cell_count,C.viability,D.molarity, D2.volume, D3.RIN,D4.Concentration FROM (\
+                            SELECT DISTINCT donors.id_sample_tmp,sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
                                 donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
                                 JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                                 JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
@@ -231,7 +257,9 @@ def main():
                                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'RIN' from mlwarehouse.qc_result  WHERE qc_type = 'RIN') as D3 on A.id_sample_tmp = D3.id_sample_tmp AND B.id_pool_lims = D3.id_pool_lims \
                                 LEFT JOIN (select id_sample_tmp,id_pool_lims,CONCAT(value,' ',units) as 'Concentration' from mlwarehouse.qc_result  WHERE qc_type = 'Concentration') as D4 on A.id_sample_tmp = D4.id_sample_tmp AND B.id_pool_lims = D4.id_pool_lims"
                                                 
-                        
+
+        # Samples that have not gone through the full Cardinal pipeline do not have records of the Sample metadata, and this has to be provided manually. 
+        #     
 
         # Here we can also establish the cohorts and generate extra metadata per sample. 
         # Have to also retrieve metadata from titin sample reception.
@@ -242,12 +270,24 @@ def main():
             field_names = [i[0] for i in mycursor2.description]
             Reviewed_metadata_donors.columns = field_names
 
+        if Reviewed_metadata_donors.empty:
+            All_Datasets = []
+
+            D2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/ELGH_fech/results/yascp_inputs/input_file.tsv',sep='\t')
+            for i,row1 in D2.iterrows():
+                print(row1.experiment_id)
+                All_Samples = row1.donor_vcf_ids.replace('\'','').split(',')
+                for sam1 in All_Samples:
+                    All_Datasets.append({'experiment_id':row1.experiment_id, 'cohort':'Cardinal ELGH','donor':sam1})
+            Reviewed_metadata_donors = pd.DataFrame(All_Datasets)
+
         # here we count the number ok UKBB and ELGH cohort individuals in pool
         Reviewed_metadata['nr_ukbb_samples']=0
         Reviewed_metadata['nr_elgh_samples']=0
         Reviewed_metadata['nr_spikeins']=0
         try:
             Reviewed_metadata_donors_dubDrop = Reviewed_metadata_donors[['experiment_id','cohort','donor']].drop_duplicates()
+            n_pooled_from_sql = []
             for id in set(Reviewed_metadata_donors_dubDrop.experiment_id):
                 # print(id)
                 pool_samples = Reviewed_metadata_donors_dubDrop[Reviewed_metadata_donors_dubDrop.experiment_id == id]
@@ -262,19 +302,25 @@ def main():
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_elgh_samples']=nr_elgh
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_spikeins']=nr_spikeins
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_ukbb_samples']=nr_ukbb
+                n_pooled1 = len(Reviewed_metadata_donors_dubDrop[Reviewed_metadata_donors_dubDrop.experiment_id == id])
+                n_pooled_from_sql.append({'experiment_id':id,'n_pooled':n_pooled1})
+            n_pooled_from_sql=pd.DataFrame(n_pooled_from_sql)
+            n_pooled_from_sql= n_pooled_from_sql.set_index('experiment_id')
             Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
-        except:
-            Reviewed_metadata['cohort']='New_RUN'
-
+    except:
+        Reviewed_metadata['cohort']='New_RUN'
+        Reviewed_metadata_donors_dubDrop = Reviewed_metadata_donors
+        Reviewed_metadata_donors['experiment_id']=0
 
             
 
         Data = Data.set_index('experiment_id')
         Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
+        Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
         
         # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
         try:
-            Data['n_pooled']=Reviewed_metadata['n_pooled']
+            Data['n_pooled']=n_pooled_from_sql['n_pooled']
             for idx1 in set(Data.index):
                 print(idx1)
                 dons = ','.join(set(list(Reviewed_metadata_donors.loc[idx1]['donor'].values)))
