@@ -262,6 +262,7 @@ def main():
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_elgh_samples']=nr_elgh
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_spikeins']=nr_spikeins
                 Reviewed_metadata.loc[Reviewed_metadata.experiment_id == id,'nr_ukbb_samples']=nr_ukbb
+            Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
         except:
             Reviewed_metadata['cohort']='New_RUN'
 
@@ -270,7 +271,7 @@ def main():
 
         Data = Data.set_index('experiment_id')
         Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
-        Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
+        
         # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
         try:
             Data['n_pooled']=Reviewed_metadata['n_pooled']
