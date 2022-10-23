@@ -307,16 +307,16 @@ def main():
             n_pooled_from_sql=pd.DataFrame(n_pooled_from_sql)
             n_pooled_from_sql= n_pooled_from_sql.set_index('experiment_id')
             Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
-    except:
-        Reviewed_metadata['cohort']='New_RUN'
-        Reviewed_metadata_donors_dubDrop = Reviewed_metadata_donors
-        Reviewed_metadata_donors['experiment_id']=0
+        except:
+            Reviewed_metadata['cohort']='New_RUN'
+            Reviewed_metadata_donors_dubDrop = Reviewed_metadata_donors
+            Reviewed_metadata_donors['experiment_id']=0
 
             
 
         Data = Data.set_index('experiment_id')
         Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
-        Reviewed_metadata_donors = Reviewed_metadata_donors.set_index('experiment_id')
+        
         
         # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
         try:
