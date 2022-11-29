@@ -54,10 +54,7 @@ workflow {
 	yascp_input(run_from_irods_tsv.out.ch_file_paths_10x_tsv_raw)
     // list work dirs to remove (because they are Irods searches, so need to always rerun on each NF run):
     // these are removed on workflow.onComplete if (params.on_complete_uncache_irods_search), see below.
-    run_from_irods_tsv.out.ch_work_dir_to_remove.mix(work_dir_to_remove)
-		.filter { it != "dont_remove" }
-		.collectFile(name: 'irods_work_dirs_to_remove.csv', newLine: true, sort: true,
-				storeDir:params.outdir)
+
 
     if (params.run_mode == "google_spreadsheet") {
 		// combine all samples tables (google spreadsheet, irods + cellranger metadata, cellranger /lustre file paths),
