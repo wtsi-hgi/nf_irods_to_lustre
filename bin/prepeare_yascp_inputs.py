@@ -135,12 +135,12 @@ def main():
                 sample1.id_run,\
                 sample1.id_study_tmp,\
                 sample1.id_study_lims, \
-                sample1.run_pending as last_updated,\
+                sample1.run_pending as last_updated, sample1.loading_concentration,sample1.created, \
                 sample1.instrument_model, \
                 sample1.instrument_external_name, \
                 sample1.instrument_name, \
                 COUNT(sample1.name) as n_pooled \
-                    FROM (SELECT DISTINCT iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, iseq_run_lane_metrics.run_pending, donors.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
+                    FROM (SELECT DISTINCT iseq_flowcell.loading_concentration,sample.created,iseq_product_metrics.id_run,sample.name,iseq_flowcell.id_library_lims,iseq_flowcell.id_study_tmp, study.id_study_lims, iseq_run_lane_metrics.run_pending, donors.last_updated, iseq_run_lane_metrics.instrument_model, 	iseq_run_lane_metrics.instrument_external_name, iseq_run_lane_metrics.instrument_name, \
                     donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
                     JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
                     JOIN mlwarehouse.study ON iseq_flowcell.id_study_tmp = study.id_study_tmp \
@@ -270,16 +270,16 @@ def main():
             field_names = [i[0] for i in mycursor2.description]
             Reviewed_metadata_donors.columns = field_names
 
-        if Reviewed_metadata_donors.empty:
-            All_Datasets = []
+        # if Reviewed_metadata_donors.empty:
+        #     All_Datasets = []
 
-            D2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/ELGH_fech/results/yascp_inputs/input_file.tsv',sep='\t')
-            for i,row1 in D2.iterrows():
-                print(row1.experiment_id)
-                All_Samples = row1.donor_vcf_ids.replace('\'','').split(',')
-                for sam1 in All_Samples:
-                    All_Datasets.append({'experiment_id':row1.experiment_id, 'cohort':'Cardinal ELGH','donor':sam1})
-            Reviewed_metadata_donors = pd.DataFrame(All_Datasets)
+        #     D2 = pd.read_csv('/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/Pilot_UKB/fetch/ELGH_fech/results/yascp_inputs/input_file.tsv',sep='\t')
+        #     for i,row1 in D2.iterrows():
+        #         print(row1.experiment_id)
+        #         All_Samples = row1.donor_vcf_ids.replace('\'','').split(',')
+        #         for sam1 in All_Samples:
+        #             All_Datasets.append({'experiment_id':row1.experiment_id, 'cohort':'Cardinal ELGH','donor':sam1})
+        #     Reviewed_metadata_donors = pd.DataFrame(All_Datasets)
 
         # here we count the number ok UKBB and ELGH cohort individuals in pool
         Reviewed_metadata['nr_ukbb_samples']=0
