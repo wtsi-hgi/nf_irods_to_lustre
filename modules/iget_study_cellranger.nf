@@ -1,12 +1,12 @@
 process 'iget_study_cellranger' {
     tag "$sample"
-    publishDir "${params.outdir}/iget_study_cellranger/${study_id}/${sample}/", mode: "${params.copy_mode}"
+    publishDir "${params.outdir}/iget_study_cellranger/${study_id}/${run_id}/${sample}/", mode: "${params.copy_mode}"
     
     when: 
     params.run_iget_study_cellranger
 
     input:
-    tuple val(study_id), val(sample), val(cellranger_irods_object)
+    tuple val(study_id), val(sample), val(cellranger_irods_object),val(run_id)
     
   output:
     tuple val(study_id), val(sample), path("cellranger_${sample}/*"), emit: study_sample_cellranger
