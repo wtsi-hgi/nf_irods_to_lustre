@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# activate Nextflow conda env
+conda init bash
+eval "$(conda shell.bash hook)"
+conda activate nextflow
 # clean up previous run files
 rm -f *.log
 rm -f nextflow.nohup.PID.txt 
