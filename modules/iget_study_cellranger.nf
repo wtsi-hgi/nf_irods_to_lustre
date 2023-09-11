@@ -30,7 +30,7 @@ ls -ltra
 echo \"${cellranger_irods_object}\" > cellranger_${sample}/irods_cellranger_path.txt
 
 # parse cellranger output file hierarchy (it depends on cellranger version) for filtered data:
-RESULTS_DIR=${params.outdir}/iget_study_cellranger/${study_id}/${sample}
+RESULTS_DIR=${params.outdir}/iget_study_cellranger/${study_id}/${run_id}/${sample}
 FILT_BARCODES=\$RESULTS_DIR/\$(find -L . | grep 'barcodes.tsv' | grep 'filtered_.*_bc_matr' | cut -c 3-)
 FILT_DIR=\$(dirname \$FILT_BARCODES)
 FILT_H5=\$RESULTS_DIR/\$(find . | grep 'filtered_.*_bc_matr.*.h5\$' | cut -c 3-)
