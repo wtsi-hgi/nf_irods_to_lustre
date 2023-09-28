@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # activate Nextflow conda env
+source /software/hgi/installs/anaconda3/etc/profile.d/conda.sh
 conda init bash
 eval "$(conda shell.bash hook)"
 conda activate nextflow
