@@ -6,7 +6,7 @@ process 'iget_study_cellranger' {
     params.run_iget_study_cellranger
 
     input:
-    tuple val(study_id), val(sample), val(cellranger_irods_object),val(run_id)
+    tuple val(study_id), val(sample), path(cellranger_irods_object_path),val(run_id)
     
   output:
     tuple val(study_id), val(sample), path("cellranger_${sample}/*"), emit: study_sample_cellranger
@@ -17,17 +17,17 @@ process 'iget_study_cellranger' {
   script:
     """
 echo pwd is \${PWD}
-
-iget -r -K -f -v ${cellranger_irods_object} cellranger_${sample}
+export cellranger_irods_object=\$(head -n1 ${cellranger_irods_object_path})
+iget -r -K -f -v \$cellranger_irods_object cellranger_${sample}
 echo first iget done
 ls -ltra
-! test -d cellranger_${sample} && sleep 10 && echo retry cellranger 1 && iget -r -K -f -v ${cellranger_irods_object} cellranger_${sample} || true
-! test -d cellranger_${sample} && sleep 10 && echo retry cellranger 2 && iget -r -K -f -v ${cellranger_irods_object} cellranger_${sample} || true
+! test -d cellranger_${sample} && sleep 10 && echo retry cellranger 1 && iget -r -K -f -v \$cellranger_irods_object cellranger_${sample} || true
+! test -d cellranger_${sample} && sleep 10 && echo retry cellranger 2 && iget -r -K -f -v \$cellranger_irods_object cellranger_${sample} || true
 ! test -d cellranger_${sample} && echo get cellranger directory failed && exit 1 || true 
 echo all iget done
 ls -ltra
 
-echo \"${cellranger_irods_object}\" > cellranger_${sample}/irods_cellranger_path.txt
+echo \"\$cellranger_irods_object\" > cellranger_${sample}/irods_cellranger_path.txt
 
 # parse cellranger output file hierarchy (it depends on cellranger version) for filtered data:
 RESULTS_DIR=${params.outdir}/iget_study_cellranger/${study_id}/${run_id}/${sample}
@@ -53,7 +53,7 @@ echo RAW_H5 is \$RAW_H5
 
 # prepare metadata tsv row for that sample:
 echo sanger_sample_id,experiment_id,irods_cellranger_path > metadata1.csv 
-echo ${sample},${sample},${cellranger_irods_object} >> metadata1.csv 
+echo ${sample},${sample},\$cellranger_irods_object >> metadata1.csv 
 cat cellranger_${sample}/metrics_summary.csv | $workflow.projectDir/../bin/remove_comma_inside_quotes.sh  > metadata2.csv
 paste -d, metadata1.csv metadata2.csv | tr ',' '\t' > ${sample}.metadata.tsv
 rm metadata1.csv 
