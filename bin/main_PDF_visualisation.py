@@ -33,7 +33,11 @@ def visualise_dataset(Data,plot_value,min_limit,max_limit):
 
 def visualise_file(name,plot_value,max_number_of_entries,output_folder):
     # Use a breakpoint in the code line below to debug your script.
-    Data = pd.read_csv(name,sep="\t")  # Press ⌘F8 to toggle the breakpoint.
+    Data = pd.read_csv(name,sep="XXXXXXX",header=None) # Press ⌘F8 to toggle the breakpoint.
+    Data = pd.DataFrame(Data[0].str.split('\t').values.tolist())
+    Data.columns = Data.iloc[0]
+    Data = Data.drop(Data.index[0])
+
     for value in plot_value.split(","):
         Reads = Data[value]
 

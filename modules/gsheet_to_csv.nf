@@ -20,13 +20,13 @@ process gsheet_to_csv {
     script:
     log.info sheet_name
     """
-    python3 $workflow.projectDir/../bin/google_spreadsheet_to_csv.py \\
-       --creds_json ${creds_json} --gsheet ${gsheet} --output_csv_name ${output_csv_name} --sheet_name ${sheet_name}
+        python3 $workflow.projectDir/../bin/google_spreadsheet_to_csv.py \\
+        --creds_json ${creds_json} --gsheet ${gsheet} --output_csv_name ${output_csv_name} --sheet_name ${sheet_name}
 
-    # Save work dir so that it can be removed onComplete of workflow, 
-    # to ensure that this task Irods search is re-run on each run NF run, 
-    # in case new sequencing samples are ready: 
-    WORK_DIR=\$PWD
-    study_id=gsheet
+        # Save work dir so that it can be removed onComplete of workflow, 
+        # to ensure that this task Irods search is re-run on each run NF run, 
+        # in case new sequencing samples are ready: 
+        WORK_DIR=\$PWD
+        study_id=gsheet
     """
 }

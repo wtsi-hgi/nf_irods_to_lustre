@@ -47,9 +47,11 @@ workflow run_from_irods_tsv {
 	    .splitCsv(header: true, sep: '\t')
 	    .map{row->tuple(row.study_id, row.sample, row.id_run)}
 	    .unique())
+
     
+
     // store the list cellranger locations found into a single tsv table called "cellranger_irods_objects.csv"
-    imeta_study_cellranger.out.study_id_sample_cellranger_object
+    imeta_study_cellranger.out.study_id_sample_cellranger_object.transpose()
 	.map{study_id, sample, run_id, cellranger_irods_object, workdir ->
 	"${study_id},${sample},${run_id},${cellranger_irods_object},${workdir}"}
 	.collectFile(name: 'cellranger_irods_objects.csv', newLine: true, sort: true,
@@ -57,9 +59,9 @@ workflow run_from_irods_tsv {
 		     storeDir:params.outdir)
     
     // task to iget the cellranger outputs from Irods:
-    iget_study_cellranger(imeta_study_cellranger.out.study_id_sample_cellranger_object
+    iget_study_cellranger(imeta_study_cellranger.out.study_id_sample_cellranger_object.transpose()
 			  .map{study_id, sample, run_id, cellranger_irods_object, workdir ->
-	    tuple(study_id, sample, cellranger_irods_object)}
+	    tuple(study_id, sample, cellranger_irods_object,run_id)}
 			  .filter { it[2] != "cellranger_irods_not_found" })
 
     // prepare Lelands' pipeline inputs
@@ -106,10 +108,10 @@ workflow run_from_irods_tsv {
     ch_work_dir_to_remove = imeta_study_cellranger.out.work_dir_to_remove
     
     emit:
-    ch_work_dir_to_remove
-    ch_cellranger_metadata_tsv
-    ch_file_paths_10x_tsv
-    ch_file_paths_10x_tsv_raw
+		ch_work_dir_to_remove
+		ch_cellranger_metadata_tsv
+		ch_file_paths_10x_tsv
+		ch_file_paths_10x_tsv_raw
 }
 
 // TODO:  here or main.nf:   // store work dirs to remove into tsv file for onComplete removal.
