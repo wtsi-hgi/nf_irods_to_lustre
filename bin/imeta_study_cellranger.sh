@@ -11,14 +11,15 @@ ils /seq/${run_id}/cellranger/ | grep ${sample} > ${sample}.cellranger.found_in_
 ils /seq/illumina/${run_id_2digits}/${run_id}/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
 ils /seq/illumina/runs/${run_id_2digits}/${run_id}/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
 ils /seq/illumina/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
+imeta qu -z /seq -C sample = ${sample} | grep cellranger | grep ${run_id} >> ${sample}.cellranger.found_in_irods.txt || true
 
 if [ -s ${sample}.cellranger.found_in_irods.txt ] 
 then 
         echo cellranger data found ${sample}
-        cat ${sample}.cellranger.found_in_irods.txt  | awk '{print $2}' >> cellranger.object.txt
+        cat ${sample}.cellranger.found_in_irods.txt  | awk '{print $2}' >> cellranger.object_dub.txt
 else
         echo cellranger data not found
 fi
 echo end cellranger fetch
-
-rm -f ${sample}.cellranger.found_in_irods.txt 
+sort -u cellranger.object_dub.txt > cellranger.object.txt
+rm -f ${sample}.cellranger.found_in_irods.txt cellranger.object_dub.txt

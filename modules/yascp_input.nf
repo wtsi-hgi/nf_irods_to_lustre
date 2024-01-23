@@ -9,7 +9,7 @@ process yascp_input{
   script: 
   """  
 
-    echo '1'
+    echo '2'
     python $workflow.projectDir/../bin/prepeare_yascp_inputs.py -f10x ${in10x_paths}
   """
 

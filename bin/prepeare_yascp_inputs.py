@@ -356,6 +356,9 @@ def main():
     Data2 = Data.loc[:,['experiment_id','n_pooled','donor_vcf_ids','data_path_10x_format']]
     Data2.to_csv('input.tsv',sep='\t', index=False)
     
-
+    # unique names regardles of sequencing
+    Data2['experiment_id'] = Data2['experiment_id']+'__'+Data2['data_path_10x_format'].str.split('/').str[-5]   +"__" +Data2['data_path_10x_format'].str.split('/').str[-3].str.split("__").str[-1]
+    Data2.to_csv('full_names_input.tsv',sep='\t', index=False)
+    
 if __name__ == '__main__':
     main()

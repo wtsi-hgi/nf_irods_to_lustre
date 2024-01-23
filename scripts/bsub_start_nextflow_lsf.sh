@@ -12,7 +12,7 @@ bsub -G hgi \
      -M 8000 \
      -n 2 \
      -o bsub.o -e bsub.e \
-     -q basement \
+     -q normal \
      bash scripts/start_nextflow_lsf.sh > bjob.id
 
 # get process PID 
