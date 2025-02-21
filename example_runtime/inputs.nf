@@ -42,7 +42,7 @@ params {
     run_iget_study_cellranger = true // whether to run task to iget all samples cellranger irods objects
     run_iget_study_cram = false // whether to run task to iget all samples cram files
     run_crams_to_fastq = false // whether to run task to merge and convert crams of each sample to fastq
-    run_metadata_visualisation = true //whether to visualise the fetched rellranger metadata.
+    run_metadata_visualisation = false //whether to visualise the fetched rellranger metadata.
     crams_to_fastq_min_reads = "1000" // minimum number of reads in merged cram file to try and convert to fastq.gz 
     copy_mode = "rellink" // choose "rellink", "symlink", "move" or "copy" to stage in crams and cellranger data from work dir into results dir
 

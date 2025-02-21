@@ -183,8 +183,7 @@ def main():
             if not Reviewed_metadata.empty:
                 field_names = [i[0] for i in mycursor.description]
                 Reviewed_metadata.columns = field_names
-
-        Reviewed_metadata['instrument'] = Reviewed_metadata['instrument_model']+'_'+Reviewed_metadata['instrument_name']+'_'+Reviewed_metadata['instrument_external_name']
+                Reviewed_metadata['instrument'] = Reviewed_metadata['instrument_model']+'_'+Reviewed_metadata['instrument_name']+'_'+Reviewed_metadata['instrument_external_name']
         # sql_donors = f"SELECT DISTINCT sample.name as experiment_id,original_study.name as cohort,donors.customer_measured_volume, \
         #                 donors.supplier_name as donor FROM mlwarehouse.iseq_flowcell \
         #                 JOIN mlwarehouse.sample ON iseq_flowcell.id_sample_tmp = sample.id_sample_tmp \
@@ -315,23 +314,23 @@ def main():
             
 
         Data = Data.set_index('experiment_id')
-        Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
         
-        
-        # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
-        try:
-            Data['n_pooled']=n_pooled_from_sql['n_pooled']
-            for idx1 in set(Data.index):
-                print(idx1)
-                dons = ','.join(set(list(Reviewed_metadata_donors.loc[idx1]['donor'].values)))
-                Data.loc[idx1,'donor_vcf_ids']='\''+dons+'\''
-        except:
-            Data['n_pooled']=1
+        if len(Reviewed_metadata)>0:
+            Reviewed_metadata=Reviewed_metadata.set_index('experiment_id')
+            # Reviewed_metadata_donors = Reviewed_metadata_donors.fillna(value=np.nan)
+            try:
+                Data['n_pooled']=n_pooled_from_sql['n_pooled']
+                for idx1 in set(Data.index):
+                    print(idx1)
+                    dons = ','.join(set(list(Reviewed_metadata_donors.loc[idx1]['donor'].values)))
+                    Data.loc[idx1,'donor_vcf_ids']='\''+dons+'\''
+            except:
+                Data['n_pooled']=1
 
-        Data=Data.reset_index()
-        Reviewed_metadata.reset_index(inplace=True)
-       
-        Reviewed_metadata.to_csv('Extra_Metadata.tsv',sep='\t', index=False)
+            Data=Data.reset_index()
+            Reviewed_metadata.reset_index(inplace=True)
+            Reviewed_metadata.to_csv('Extra_Metadata.tsv',sep='\t', index=False)
+            
         try:
             # if len(Reviewed_metadata_donors)!=0:
             #     Reviewed_metadata_donors=Reviewed_metadata_donors.set_index('experiment_id')
@@ -353,6 +352,7 @@ def main():
         # Here we also want to querry the google sheet to retrieve additional metrics - Date sample recieved, Low viability, Low volume on arrival.
         
     # Data2 = Data.loc['experiment_id','n_pooled','donor_vcf_ids','data_path_10x_format']
+    Data = Data.reset_index()
     Data2 = Data.loc[:,['experiment_id','n_pooled','donor_vcf_ids','data_path_10x_format']]
     Data2.to_csv('input.tsv',sep='\t', index=False)
     

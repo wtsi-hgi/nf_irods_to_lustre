@@ -39,14 +39,14 @@ workflow run_from_irods_tsv {
 	.collectFile(name: "crams_to_fastq_numreads.tsv",
 		     newLine: false, sort: true, keepHeader: true,
 		     storeDir:params.outdir)
-    
-    // task to search Irods cellranger location for each sample:
-    imeta_study_cellranger(
-	channel_samples_tsv
+    input_chanel = 	channel_samples_tsv
 	    .map{study_id, samples_tsv -> samples_tsv}
 	    .splitCsv(header: true, sep: '\t')
-	    .map{row->tuple(row.study_id, row.sample, row.id_run)}
-	    .unique())
+	    .map{row->tuple("$row.study_id", "$row.sample", "$row.id_run")}
+	    .unique()
+	input_chanel.subscribe { println "input_chanel: $it" }
+    // task to search Irods cellranger location for each sample:
+    imeta_study_cellranger(input_chanel)
 
     
 
@@ -103,7 +103,7 @@ workflow run_from_irods_tsv {
   		     storeDir:params.outdir)
 	.set { ch_cellranger_metadata_tsv  }
     
-    visualiseMetadata( ch_cellranger_metadata_tsv )
+    // visualiseMetadata( ch_cellranger_metadata_tsv )
     
     ch_work_dir_to_remove = imeta_study_cellranger.out.work_dir_to_remove
     

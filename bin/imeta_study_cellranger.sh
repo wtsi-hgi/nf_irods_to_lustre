@@ -1,4 +1,5 @@
 #!/bin/bash -euo pipefail
+set -eo pipefail
 export sample=$1
 export run_id=$2
 
@@ -11,6 +12,7 @@ ils /seq/${run_id}/cellranger/ | grep ${sample} > ${sample}.cellranger.found_in_
 ils /seq/illumina/${run_id_2digits}/${run_id}/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
 ils /seq/illumina/runs/${run_id_2digits}/${run_id}/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
 ils /seq/illumina/cellranger/ | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
+ils ${sample}/.. | grep ${sample} >> ${sample}.cellranger.found_in_irods.txt || true
 imeta qu -z /seq -C sample = ${sample} | grep cellranger | grep ${run_id} >> ${sample}.cellranger.found_in_irods.txt || true
 
 if [ -s ${sample}.cellranger.found_in_irods.txt ] 
